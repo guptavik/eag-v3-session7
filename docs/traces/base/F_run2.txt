@@ -1,0 +1,36 @@
+
+══════════════════════════════════════════════════════════════════════════════
+run d4c2e445  ─  query: Across the papers I have indexed, what do they say about chain-of-thought reasoning?
+══════════════════════════════════════════════════════════════════════════════
+[mcp] loaded 11 tools: ['web_search', 'fetch_url', 'get_time', 'currency_convert', 'read_file', 'list_dir', 'create_file', 'update_file', 'edit_file', 'index_document', 'search_knowledge']
+
+─── iter 1 ─────────────────────────────────────────────
+[memory.read]   8 hits
+[perception]    ○ g:c319e318 — Query the existing knowledge base for information on chain-of-thought reasoning
+[perception]    ○ g:d8b1d584 — Synthesise an answer regarding chain-of-thought reasoning across the indexed papers
+[decision]      TOOL_CALL: search_knowledge({"query": "chain-of-thought reasoning"})
+[action]        → {   "id": "mem:02dfd853",   "descriptor": "[sandbox:papers/react.md chunk 1/1] # ReAct: Synergizing Reasoning and Acting in Language Models (2022) ## Problem Chain-of-thought reasoning happens entire"...
+
+─── iter 2 ─────────────────────────────────────────────
+[memory.read]   8 hits
+[perception]    ✓ g:c319e318 — Query the existing knowledge base for information on chain-of-thought reasoning
+[perception]    ○ g:d8b1d584 — Synthesise an answer regarding chain-of-thought reasoning across the indexed papers
+[decision]      ANSWER: Based on the indexed papers, chain-of-thought (CoT) reasoning is a technique designed to improve the performance of large language models on complex tasks that require multi-step logic, such as arithm...
+
+─── iter 3 ─────────────────────────────────────────────
+[memory.read]   8 hits
+[perception]    ✓ g:c319e318 — Query the existing knowledge base for information on chain-of-thought reasoning
+[perception]    ✓ g:d8b1d584 — Synthesise an answer regarding chain-of-thought reasoning across the indexed papers
+
+[done] all 2 goals satisfied
+
+══════════════════════════════════════════════════════════════════════════════
+FINAL: Based on the indexed papers, chain-of-thought (CoT) reasoning is a technique designed to improve the performance of large language models on complex tasks that require multi-step logic, such as arithmetic, commonsense, and symbolic reasoning.
+
+Key insights regarding CoT include:
+
+*   **The Core Limitation:** Standard few-shot prompting often fails on complex problems because it only provides the final answer in examples. This prevents the model from learning how to decompose a problem into the necessary intermediate steps.
+*   **The CoT Method:** Chain-of-thought prompting addresses this by including a series of intermediate reasoning steps within the few-shot exemplars. By showing the model the "worked path" to a solution, the model is better equipped to generate its own reasoning traces during inference.
+*   **Evolution and Integration:** While CoT improves reasoning, it traditionally occurs entirely within the model, which can lead to hallucinations on knowledge-heavy tasks because the model cannot verify its reasoning against external facts. The **ReAct** framework builds upon this by interleaving these free-form reasoning traces with discrete actions (such as tool use or web searches). This allows the model to not only reason through a problem but also to gather external information and adjust its plan dynamically, effectively bridging the gap between internal reasoning and external action.
+══════════════════════════════════════════════════════════════════════════════
+
