@@ -1,0 +1,11 @@
+[gateway] launching llm_gatewayV7 from Z:\eag-v3\eag-v3-session7\llm_gatewayV7
+[gateway] up on http://localhost:8107
+
+══════════════════════════════════════════════════════════════════════════════
+run 1822cfb8  ─  query: What is the current time in Asia/Kolkata?
+══════════════════════════════════════════════════════════════════════════════
+[memory.remember] classifier failed (HTTPStatusError("Client error '400 Bad Request' for url 'http://localhost:8107/v1/chat'\nFor more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/400")); falling back to fact-write
+[mcp] loaded 11 tools: ['web_search', 'fetch_url', 'get_time', 'currency_convert', 'read_file', 'list_dir', 'create_file', 'update_file', 'edit_file', 'index_document', 'search_knowledge']
+
+─── iter 1 ─────────────────────────────────────────────
+[memory.read]   2 hits
