@@ -43,6 +43,11 @@ uv run agent7.py "What is the current time in Asia/Tokyo and Asia/Kolkata? Tell 
 - [Testing](#testing)
 - [Design principles & invariants](#design-principles--invariants)
 - [Known limitations & caveats](#known-limitations--caveats)
+- [Corpus manifest](#corpus-manifest)
+- [Base query traces (A–H)](#base-query-traces-ah)
+- [Custom RAG queries](#custom-rag-queries)
+- [Architectural principles](#architectural-principles)
+- [Reproduce the traces](#reproduce-the-traces)
 
 ---
 
@@ -470,3 +475,328 @@ These are documented honestly so they aren't mistaken for bugs:
 > [gateway.py](gateway.py) now resolves `llm_gatewayV7/` as a sibling of the
 > agent (`Path(__file__).resolve().parent`), the `requirements.txt` drift vs
 > `pyproject.toml` is fixed, and `test_list_dir` is updated to the S7 dict shape.
+
+---
+
+## Corpus manifest
+
+Two tracked directories back the assignment deliverables:
+
+- **`sandbox/papers/`** (5 files) — reference summaries for **base queries E–H**.
+  These 5 are also included in the big corpus.
+- **`sandbox/corpus/`** (55 files) — the full RAG corpus for the **5 custom queries**.
+
+Each file: ~200–350 words, template `Title/Year · Problem · Method · Key contributions · Results`.
+Full manifest: [sandbox/corpus/MANIFEST.md](sandbox/corpus/MANIFEST.md)
+
+| # | filename | title | year | tags |
+|---|----------|-------|------|------|
+| 1 | attention.md | Attention Is All You Need | 2017 | transformer, attention |
+| 2 | bert.md | BERT: Pre-training of Deep Bidirectional Transformers | 2018 | pretraining, nlp |
+| 3 | gpt3.md | Language Models are Few-Shot Learners (GPT-3) | 2020 | llm, few-shot |
+| 4 | resnet.md | Deep Residual Learning (ResNet) | 2015 | vision, residual |
+| 5 | word2vec.md | Efficient Estimation of Word Representations (word2vec) | 2013 | embeddings |
+| 6 | seq2seq.md | Sequence to Sequence Learning with Neural Networks | 2014 | seq2seq |
+| 7 | lstm.md | Long Short-Term Memory | 1997 | rnn, memory |
+| 8 | dropout.md | Dropout: Preventing Overfitting | 2014 | regularization |
+| 9 | batchnorm.md | Batch Normalization | 2015 | training, normalization |
+| 10 | layernorm.md | Layer Normalization | 2016 | training, normalization |
+| 11 | adam.md | Adam: A Method for Stochastic Optimization | 2014 | optimizer |
+| 12 | gan.md | Generative Adversarial Networks | 2014 | generative |
+| 13 | vae.md | Auto-Encoding Variational Bayes (VAE) | 2013 | generative |
+| 14 | unet.md | U-Net: Biomedical Image Segmentation | 2015 | vision, segmentation |
+| 15 | vit.md | An Image is Worth 16x16 Words (ViT) | 2020 | vision, transformer |
+| 16 | cot.md | Chain-of-Thought Prompting | 2022 | reasoning, prompting |
+| 17 | react.md | ReAct: Synergizing Reasoning and Acting | 2022 | reasoning, agents |
+| 18 | scratchpad.md | Show Your Work: Scratchpads | 2021 | reasoning |
+| 19 | self_consistency.md | Self-Consistency Improves Chain-of-Thought | 2022 | reasoning |
+| 20 | tot.md | Tree of Thoughts | 2023 | reasoning, search |
+| 21 | least_to_most.md | Least-to-Most Prompting | 2022 | reasoning, prompting |
+| 22 | toolformer.md | Toolformer: LMs Can Use Tools | 2023 | agents, tools |
+| 23 | reflexion.md | Reflexion: Verbal Reinforcement Learning | 2023 | agents, reasoning |
+| 24 | instructgpt.md | InstructGPT: Following Instructions with Human Feedback | 2022 | rlhf, alignment |
+| 25 | dpo.md | Direct Preference Optimization | 2023 | alignment, preference |
+| 26 | ppo.md | Proximal Policy Optimization | 2017 | rl, policy |
+| 27 | rlhf_summarize.md | Learning to Summarize from Human Feedback | 2020 | rlhf, alignment |
+| 28 | constitutional_ai.md | Constitutional AI | 2022 | alignment, safety |
+| 29 | kto.md | KTO: Prospect-Theoretic Optimization | 2024 | alignment, preference |
+| 30 | lora.md | LoRA: Low-Rank Adaptation | 2021 | peft, efficiency |
+| 31 | qlora.md | QLoRA: Finetuning of Quantized LLMs | 2023 | peft, quantization |
+| 32 | adapters.md | Parameter-Efficient Transfer Learning (Adapters) | 2019 | peft |
+| 33 | prefix_tuning.md | Prefix-Tuning | 2021 | peft, prompting |
+| 34 | prompt_tuning.md | The Power of Scale for Prompt Tuning | 2021 | peft, prompting |
+| 35 | distillation.md | Distilling the Knowledge in a Neural Network | 2015 | compression |
+| 36 | llm_int8.md | LLM.int8(): 8-bit Matrix Multiplication | 2022 | quantization |
+| 37 | flashattention.md | FlashAttention | 2022 | efficiency, attention |
+| 38 | moe.md | Sparsely-Gated Mixture-of-Experts | 2017 | scaling, moe |
+| 39 | switch_transformer.md | Switch Transformers | 2021 | scaling, moe |
+| 40 | rag.md | Retrieval-Augmented Generation | 2020 | retrieval, rag |
+| 41 | dpr.md | Dense Passage Retrieval | 2020 | retrieval |
+| 42 | realm.md | REALM: Retrieval-Augmented Pre-Training | 2020 | retrieval, rag |
+| 43 | fid.md | Fusion-in-Decoder | 2020 | retrieval, rag |
+| 44 | colbert.md | ColBERT: Late Interaction Passage Search | 2020 | retrieval |
+| 45 | faiss.md | Billion-Scale Similarity Search (FAISS) | 2017 | retrieval, ann |
+| 46 | scaling_laws.md | Scaling Laws for Neural Language Models | 2020 | scaling |
+| 47 | chinchilla.md | Training Compute-Optimal LLMs (Chinchilla) | 2022 | scaling |
+| 48 | t5.md | Unified Text-to-Text Transformer (T5) | 2019 | pretraining |
+| 49 | palm.md | PaLM: Scaling with Pathways | 2022 | llm, scaling |
+| 50 | llama.md | LLaMA: Open Foundation Models | 2023 | llm |
+| 51 | clip.md | Learning Transferable Visual Models (CLIP) | 2021 | multimodal, vision |
+| 52 | dalle.md | Zero-Shot Text-to-Image Generation (DALL-E) | 2021 | multimodal, generative |
+| 53 | flamingo.md | Flamingo: a Visual Language Model | 2022 | multimodal |
+| 54 | whisper.md | Robust Speech Recognition (Whisper) | 2022 | speech |
+| 55 | ddpm.md | Denoising Diffusion Probabilistic Models | 2020 | generative, diffusion |
+
+---
+
+## Base query traces (A–H)
+
+All eight queries run verbatim against `agent7.py`. Traces: [docs/traces/base/](docs/traces/base/)
+
+| Query | Iters | Bound | Trace |
+|-------|-------|-------|-------|
+| A — Shannon Wikipedia | 3 | ≤3 | [A.txt](docs/traces/base/A.txt) |
+| B — Tokyo activities + weather | 4 | ≤8 | [B.txt](docs/traces/base/B.txt) |
+| C run 1 — remember birthday | 4 | ≤4 | [C.txt](docs/traces/base/C.txt) |
+| C run 2 — recall birthday | 3 | ≤3 | [C_run2.txt](docs/traces/base/C_run2.txt) |
+| D — asyncio best practices | 6 | ≤6 | [D.txt](docs/traces/base/D.txt) |
+| E — index attention.md + extract | 4 | ≤5 | [E.txt](docs/traces/base/E.txt) |
+| F run 1 — index papers/ | 9 | ≤11 | [F.txt](docs/traces/base/F.txt) |
+| F run 2 — cross-run recall | 3 | ≤3 | [F_run2.txt](docs/traces/base/F_run2.txt) |
+| G — synonym recall (credit assignment) | 3 | ≤4 | [G.txt](docs/traces/base/G.txt) |
+| H — ReAct vs CoT comparison | 3 | ≤3 | [H.txt](docs/traces/base/H.txt) |
+
+### Trace excerpts
+
+**A — Shannon Wikipedia** (3 iters · `fetch_url` → 262 KB artifact → attach → answer):
+> Claude Shannon was born on April 30, 1916, and passed away on February 24, 2001.
+> Key contributions: (1) the Mathematical Theory of Communication, (2) the Source Coding
+> Theorem, (3) the Shannon-Hartley Channel Capacity theorem.
+
+**C run 2 — cross-run birthday recall** (3 iters · zero tool calls · FAISS):
+> Mom's birthday is on 15 May 2026. Reminders have been set for 1 May 2026 and 15 May 2026.
+
+**F run 2 — cross-run FAISS persistence** (3 iters · fresh process · no re-indexing):
+> Based on the indexed papers, chain-of-thought (CoT) reasoning is a technique designed
+> to improve LLM performance on multi-step tasks by including intermediate reasoning steps
+> in few-shot exemplars…
+
+**G — synonym recall** (3 iters · "credit assignment" absent from all 5 papers):
+> Each paper addresses credit assignment through its own mechanism: Attention via
+> global self-attention weights; CoT via explicit step-by-step decomposition; DPO via
+> direct policy optimization removing the explicit reward; LoRA via low-rank parameter
+> constraints; ReAct via linking internal reasoning to external action feedback.
+
+**H — cross-doc synthesis** (3 iters · `search_knowledge` → cot.md + react.md chunks):
+> CoT treats intermediate reasoning as a static internal cognitive process (purely within
+> the model). ReAct treats it as a dynamic interactive loop — interleaving thoughts with
+> tool actions so reasoning is grounded in external facts.
+
+### Diagnostic note: G iteration history
+
+First run: 17 iters (exceeded ≤4 bound). Decision looped on `search_knowledge` because
+none of the 5 papers directly contain the phrase "credit assignment" — it kept searching
+for a more specific answer rather than synthesising from the related chunks it had.
+
+**Root cause:** a logic gap, not a rendering bug. Chunk content was visible in memory
+hits (`_format_hits` renders `value.chunk`); Decision correctly judged it indirect and
+searched for more. The fix: add an explicit anti-loop rule to Decision's SYSTEM prompt —
+"if `search_knowledge` was already called with a similar query and returned results,
+synthesise from what is visible rather than re-issuing the same query." After the fix:
+3 iters, excellent answer. See [decision.py](decision.py) ANTI-LOOP rule.
+
+---
+
+## Custom RAG queries
+
+Five queries against the 55-paper corpus. At least two require **semantic recall** —
+the query words do not appear in any chunk that answers them.
+
+Traces: [docs/traces/custom/](docs/traces/custom/)
+
+| # | Query | Type | With-corpus | No-corpus |
+|---|-------|------|-------------|-----------|
+| Q1 | Across these papers, how do they handle the credit assignment problem? | **Semantic** | [1_with.txt](docs/traces/custom/1_with.txt) | [1_nocorpus.txt](docs/traces/custom/1_nocorpus.txt) |
+| Q2 | Which methods make adapting a huge model affordable on a single GPU? | **Semantic** | [2_with.txt](docs/traces/custom/2_with.txt) | [2_nocorpus.txt](docs/traces/custom/2_nocorpus.txt) |
+| Q3 | What are the three key contributions of the Transformer according to the attention paper? | Index-only | [3_with.txt](docs/traces/custom/3_with.txt) | [3_nocorpus.txt](docs/traces/custom/3_nocorpus.txt) |
+| Q4 | Compare how DPO and PPO-style RLHF approach preference optimization. | Cross-doc synthesis | [4_with.txt](docs/traces/custom/4_with.txt) | [4_nocorpus.txt](docs/traces/custom/4_nocorpus.txt) |
+| Q5 | Which papers teach a model to reason before answering, and how do they differ? | Semantic synthesis | [5_with.txt](docs/traces/custom/5_with.txt) | [5_nocorpus.txt](docs/traces/custom/5_nocorpus.txt) |
+
+### Semantic recall proof (Q1 and Q2)
+
+The phrases `credit assignment`, `single GPU`, `one GPU`, and `affordable` are **absent** from every corpus chunk:
+
+```bash
+# run from repo root — all should print nothing
+grep -ri "credit assignment" sandbox/corpus/
+grep -riE "single gpu|one gpu" sandbox/corpus/
+grep -ri "affordable" sandbox/corpus/
+```
+
+Vector search surfaces the right papers by concept, not by keyword:
+
+- **Q1** → seq2seq (temporal flow), attention (global weights), layernorm (gradient
+  stability), flashattention (sequence length), constitutional\_ai (feedback loop),
+  KTO (value assignment), ReAct (action feedback) — all relate to "how does the system
+  know which part deserves credit?" without ever using those words.
+
+- **Q2** → LoRA (low-rank updates), QLoRA (4-bit quantized base + adapters), Adapters
+  (bottleneck modules), Prompt Tuning (soft prompts), GPT-3 (no-weight in-context),
+  Distillation (student from teacher) — all reduce the cost of adapting a large model
+  without the corpus mentioning "affordable" or "single GPU."
+
+### With vs without: contrast summary
+
+| Q | With-corpus (iters) | No-corpus outcome |
+|---|--------------------|--------------------|
+| Q1 | 3 — cites 7 indexed papers, no web search | 4 — generic RL-theory answer from web search, no corpus citations |
+| Q2 | 3 — cites LoRA/QLoRA/Adapters/etc. | 3 — generic answer, no provenance |
+| Q3 | 3 — quotes from attention.md chunk | 4 — correct from parametric knowledge only |
+| Q4 | 3 — synthesises dpo.md + ppo.md + instructgpt.md | 3 — parametric answer, no chunk sources |
+| Q5 | 4 — cites ReAct, Reflexion, Constitutional AI | 7 — web search needed, less specific |
+
+---
+
+## Architectural principles
+
+### 1. Tool-blindness in Perception
+
+Perception's SYSTEM prompt names **zero MCP tools**. Tool-selection guidance lives in
+Decision's SYSTEM and in the docstrings on the MCP tools themselves.
+
+**The gate (run after any edit to perception.py):**
+
+```bash
+uv run pytest -v test_perception_tool_blindness.py
+grep -E "web_search|fetch_url|get_time|currency_convert|read_file|list_dir|create_file|update_file|edit_file|index_document|search_knowledge" perception.py && echo FAIL || echo PASS
+```
+
+**Why this matters:** if Perception names tools, it performs tool selection by emitting
+goal text like "use `index_document` on this file." This seems harmless but is
+architecturally wrong. Tool guidance pushed into Perception's SYSTEM becomes context
+bloat as the tool set grows, and it breaks the clean boundary that lets Decision
+independently reason about which tool fits each goal. The guidance belongs in the tool's
+docstring, where it co-locates with the tool definition and the model sees it precisely
+when it is selecting a tool.
+
+### 2. Diagnostic discipline: fix the rendering, not the SYSTEM
+
+When a role misbehaves, the reflex is to add a rule to its SYSTEM prompt. The right
+procedure is to first reconstruct what the role **actually saw** on the failing turn:
+
+1. **Capture** the trace from the failing iteration.
+2. **Identify** which role produced the wrong output.
+3. **Reconstruct** the exact prompt it received by reading the source code that builds it.
+   Pay attention to truncation and fields that may be dropped.
+4. **Ask:** given that input, was the output rational?
+   - **Yes** → the bug is in the rendering layer. Fix `_format_hits`, `_format_history`,
+     or similar. Do **not** add a SYSTEM rule.
+   - **No** → the bug is in the role's SYSTEM or the model tier.
+5. **Apply** the fix at the right boundary only.
+
+**Session 7 examples:**
+
+*Mom's birthday query (C run 2):* First fix attempt added a SYSTEM rule to Decision
+saying "answer from memory when memory contains the date." Actual cause: `_format_hits`
+rendered the descriptor ("mom's birthday remembered") but dropped `value.raw` which
+contained "15 May 2026." Fix: render the `raw` field. SYSTEM addition removed.
+
+*Synonym recall loop (G):* First run: 17 iters, Decision looped on `search_knowledge`.
+Root cause was a **logic gap**, not a rendering bug — chunks were visible but Decision
+correctly judged none directly mentioned "credit assignment" and kept searching for
+something more specific. Fix: add the ANTI-LOOP rule (calling the same tool with the
+same args never produces new results). After fix: 3 iters.
+
+### 3. Byte isolation
+
+Raw bytes reach an LLM **only** when Perception explicitly attaches an artifact to a
+goal. The artifact store holds bytes; Memory holds handles + one-line descriptors.
+A 262 KB Wikipedia page touches exactly one LLM call per run — the extraction turn
+where Perception sets `attach_artifact_id`.
+
+### 4. Frozen embedding model (768-dim)
+
+The embedding model is pinned at the gateway level (Ollama `nomic-embed-text` →
+768-dim; Gemini `gemini-embedding-001` → `outputDimensionality=768`). Changing either
+model or the dimension **silently invalidates** every vector in the FAISS index. The
+index raises on dimension mismatch as a guard rail, but the invalidation itself is
+silent. Treat the model as a project-level constant for the lifetime of an index.
+
+---
+
+## Reproduce the traces
+
+### Prerequisites
+
+- `uv sync` (installs `tzdata`, `faiss-cpu`, `numpy`, etc.)
+- Gateway running: `cd llm_gatewayV7 && uv run main.py` (or let `agent7` auto-start it)
+- `.env` with `GEMINI_API_KEY`, `GROQ_API_KEY`, and optionally `TAVILY_API_KEY`
+
+### Base traces (A–H)
+
+```bash
+# State plan: A clears first; A→B→C-run1→C-run2→D share state;
+# E clears; F-run1 clears; F-run1→F-run2→G→H share state.
+
+uv run run_query.py --clear --out docs/traces/base/A.txt \
+  "Fetch https://en.wikipedia.org/wiki/Claude_Shannon and tell me his birth date, death date, and three key contributions to information theory."
+
+uv run run_query.py --out docs/traces/base/B.txt \
+  "Find 3 family-friendly things to do in Tokyo this weekend. Check Saturday's weather forecast there and tell me which one is most appropriate."
+
+uv run run_query.py --out docs/traces/base/C.txt \
+  "My mom's birthday is 15 May 2026. Remember that and create reminders for two weeks before and on the day."
+
+uv run run_query.py --out docs/traces/base/C_run2.txt \
+  "When is mom's birthday?"
+
+uv run run_query.py --out docs/traces/base/D.txt \
+  'Search for "Python asyncio best practices", read the top 3 results, and give me a short numbered list of the advice they agree on.'
+
+uv run run_query.py --clear --out docs/traces/base/E.txt \
+  "Index the file papers/attention.md and tell me what the three key contributions of the Transformer architecture are according to this paper."
+
+uv run run_query.py --clear --out docs/traces/base/F.txt \
+  "Index every .md file under papers/. Confirm how many chunks were indexed in total."
+
+uv run run_query.py --out docs/traces/base/F_run2.txt \
+  "Across the papers I have indexed, what do they say about chain-of-thought reasoning?"
+
+uv run run_query.py --out docs/traces/base/G.txt \
+  "Across these papers, how do they handle the credit assignment problem?"
+
+uv run run_query.py --out docs/traces/base/H.txt \
+  "Compare how the ReAct paper and the Chain-of-Thought paper differ in their treatment of intermediate reasoning."
+```
+
+### Custom queries (5 × with-corpus + 5 × no-corpus)
+
+```bash
+# --- no-corpus runs (cleared state, no index) ---
+uv run run_query.py --clear --out docs/traces/custom/1_nocorpus.txt \
+  "Across these papers, how do they handle the credit assignment problem?"
+uv run run_query.py --out docs/traces/custom/2_nocorpus.txt \
+  "Which methods make adapting a huge model affordable on a single GPU?"
+uv run run_query.py --out docs/traces/custom/3_nocorpus.txt \
+  "What are the three key contributions of the Transformer according to the attention paper?"
+uv run run_query.py --out docs/traces/custom/4_nocorpus.txt \
+  "Compare how DPO and PPO-style RLHF approach preference optimization."
+uv run run_query.py --out docs/traces/custom/5_nocorpus.txt \
+  "Which papers teach a model to reason before answering, and how do they differ?"
+
+# --- build the full corpus index ---
+python -c "import memory; memory.clear()"
+uv run build_corpus_index.py corpus   # indexes all 55 files (~55 chunks)
+
+# --- with-corpus runs (shared index) ---
+uv run run_query.py --out docs/traces/custom/1_with.txt \
+  "Across these papers, how do they handle the credit assignment problem?"
+uv run run_query.py --out docs/traces/custom/2_with.txt \
+  "Which methods make adapting a huge model affordable on a single GPU?"
+uv run run_query.py --out docs/traces/custom/3_with.txt \
+  "What are the three key contributions of the Transformer according to the attention paper?"
+uv run run_query.py --out docs/traces/custom/4_with.txt \
+  "Compare how DPO and PPO-style RLHF approach preference optimization."
+uv run run_query.py --out docs/traces/custom/5_with.txt \
+  "Which papers teach a model to reason before answering, and how do they differ?"
+```
