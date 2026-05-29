@@ -198,10 +198,11 @@ def observe(
 
     # Goal-count invariant: never contract, never reorder. Prior goals keep
     # their slot and id; Perception may APPEND new goals after the prior
-    # list when a discovery action (e.g. list_dir) reveals work that wasn't
-    # knowable on iter 1. NOTES_RUNS §6 (4): the previous hard-truncate to
-    # `len(prior_goals)` blocked F-run-1 verbatim — list_dir revealed five
-    # papers, but the goal list was locked to the three placeholders emitted
+    # list when a discovery action (e.g. a directory listing) reveals work
+    # that wasn't knowable on iter 1. NOTES_RUNS §6 (4): the previous
+    # hard-truncate to `len(prior_goals)` blocked F-run-1 verbatim — the
+    # directory listing revealed five papers, but the goal list was locked
+    # to the three placeholders emitted
     # before the listing was known. We still drop appended goals whose text
     # duplicates a prior goal (the temp=1.0 dup-append failure mode that
     # motivated the original lock).
