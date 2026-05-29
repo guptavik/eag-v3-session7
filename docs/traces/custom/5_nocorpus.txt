@@ -1,0 +1,76 @@
+
+══════════════════════════════════════════════════════════════════════════════
+run c1dce0a6  ─  query: Which papers teach a model to reason before answering, and how do they differ?
+══════════════════════════════════════════════════════════════════════════════
+[mcp] loaded 11 tools: ['web_search', 'fetch_url', 'get_time', 'currency_convert', 'read_file', 'list_dir', 'create_file', 'update_file', 'edit_file', 'index_document', 'search_knowledge']
+
+─── iter 1 ─────────────────────────────────────────────
+[memory.read]   8 hits
+[perception]    ○ g:17631aa3 — Query the knowledge base for papers describing models that reason before answering.  attach=art:cc3c198dde289b7e
+[perception]    ○ g:c9001101 — Synthesise the information to identify the papers and compare their approaches.
+[attach]        art:cc3c198dde289b7e (11049 bytes)
+[decision]      TOOL_CALL: search_knowledge({"query": "models that reason before answering"})
+[action]        → {   "id": "mem:e78df8cc",   "descriptor": "Analysis of research papers on models that reason before answering",   "source": "user_query",   "chunk_preview": "",   "metadata": {     "raw": "Which paper...
+
+─── iter 2 ─────────────────────────────────────────────
+[memory.read]   8 hits
+[perception]    ○ g:17631aa3 — Query the knowledge base for papers describing models that reason before answering.  attach=art:cc3c198dde289b7e
+[perception]    ○ g:c9001101 — Synthesise the information to identify the papers and compare their approaches.
+[attach]        art:cc3c198dde289b7e (11049 bytes)
+[decision]      TOOL_CALL: search_knowledge({"query": "models that reason before answering"})
+[action]        → {   "id": "mem:e78df8cc",   "descriptor": "Analysis of research papers on models that reason before answering",   "source": "user_query",   "chunk_preview": "",   "metadata": {     "raw": "Which paper...
+
+─── iter 3 ─────────────────────────────────────────────
+[memory.read]   8 hits
+[perception]    ○ g:17631aa3 — Query the knowledge base for papers describing models that reason before answering.  attach=art:cc3c198dde289b7e
+[perception]    ○ g:c9001101 — Synthesise the information to identify the papers and compare their approaches.
+[attach]        art:cc3c198dde289b7e (11049 bytes)
+[decision]      TOOL_CALL: search_knowledge({"query": "models that reason before answering"})
+[action]        → {   "id": "mem:e78df8cc",   "descriptor": "Analysis of research papers on models that reason before answering",   "source": "user_query",   "chunk_preview": "",   "metadata": {     "raw": "Which paper...
+
+─── iter 4 ─────────────────────────────────────────────
+[memory.read]   8 hits
+[perception]    ○ g:17631aa3 — Query the knowledge base for papers describing models that reason before answering.
+[perception]    ○ g:c9001101 — Synthesise the information to identify the papers and compare their approaches.
+[decision]      ANSWER: The knowledge base contains an entry titled "Analysis of research papers on models that reason before answering" (ID: mem:e78df8cc), which specifically addresses the topic of models taught to reason b...
+
+─── iter 5 ─────────────────────────────────────────────
+[memory.read]   8 hits
+[perception]    ✓ g:17631aa3 — Query the knowledge base for papers describing models that reason before answering.
+[perception]    ○ g:c9001101 — Synthesise the information to identify the papers and compare their approaches.
+[decision]      TOOL_CALL: web_search({"query": "research papers on models that reason before answering and their differences"})
+[action]        → [artifact art:2bf2b6faa16844c1, 7871 bytes] preview: {   "title": "AI reasoning vs non-reasoning models: key differences explained",   "url": "https://www.narrativa.com/ai-reasoning-vs-non-reasoning-m...   +art:2bf2b6faa16844c1
+
+─── iter 6 ─────────────────────────────────────────────
+[memory.read]   8 hits
+[perception]    ✓ g:17631aa3 — Query the knowledge base for papers describing models that reason before answering.
+[perception]    ○ g:c9001101 — Synthesise the information to identify the papers and compare their approaches.  attach=art:2bf2b6faa16844c1
+[attach]        art:2bf2b6faa16844c1 (7871 bytes)
+[decision]      ANSWER: Based on the provided information, research into models that "reason before answering" focuses on shifting from simple pattern-based prediction to structured, multi-step logical processing. While spec...
+
+─── iter 7 ─────────────────────────────────────────────
+[memory.read]   8 hits
+[perception]    ✓ g:17631aa3 — Query the knowledge base for papers describing models that reason before answering.
+[perception]    ✓ g:c9001101 — Synthesise the information to identify the papers and compare their approaches.
+
+[done] all 2 goals satisfied
+
+══════════════════════════════════════════════════════════════════════════════
+FINAL: Based on the provided information, research into models that "reason before answering" focuses on shifting from simple pattern-based prediction to structured, multi-step logical processing. While specific academic paper titles are not exhaustively listed in the provided snippets, the literature identifies distinct approaches and architectural differences between these models and traditional AI.
+
+### Comparison of Approaches
+
+| Feature | Traditional (Non-Reasoning) Models | Reasoning Models |
+| :--- | :--- | :--- |
+| **Core Mechanism** | Pattern recognition and statistical correlation. | Logical deduction, multi-step problem solving, and causal reasoning. |
+| **Response Style** | Instantaneous, reactive, and often lacks explanation. | "Thinks" before responding; breaks down problems into smaller, logical steps. |
+| **Training Focus** | Large labeled datasets and fixed rules. | Multi-stage fine-tuning, reinforcement learning (RL), and chain-of-thought (CoT) examples. |
+| **Reliability** | High speed, but struggles with ambiguity or complex inference. | Higher computational cost, but better at handling abstract logic and complex tasks. |
+
+### Key Methodological Differences
+*   **Chain-of-Thought (CoT):** Reasoning models are often trained to explicitly output their thought process (e.g., "Think step by step"). This allows the model to analyze structure and compare patterns before committing to a final answer.
+*   **Multi-Stage Fine-Tuning:** Models like DeepSeek-R1 utilize iterative training phases. This typically involves an initial RL stage to develop reasoning capabilities, followed by supervised learning on curated data (including CoT examples), and further feedback loops to refine consistency.
+*   **Integration of External Systems:** Unlike traditional models that rely solely on internal weights, some reasoning architectures integrate external knowledge bases or symbolic systems to validate logical consistency during the reasoning process.
+*   **Challenges in Faithfulness:** Research (e.g., from Anthropic) highlights that reasoning models can sometimes be unfaithful to their own internal logic. They may construct "fake rationales" to justify incorrect answers if they are incentivized by reward hacks, demonstrating that the reasoning process is not always a transparent reflection of the model's true "thought" process.
+══════════════════════════════════════════════════════════════════════════════
+

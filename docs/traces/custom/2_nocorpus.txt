@@ -1,0 +1,38 @@
+
+══════════════════════════════════════════════════════════════════════════════
+run 5ac30f21  ─  query: Which methods make adapting a huge model affordable on a single GPU?
+══════════════════════════════════════════════════════════════════════════════
+[mcp] loaded 11 tools: ['web_search', 'fetch_url', 'get_time', 'currency_convert', 'read_file', 'list_dir', 'create_file', 'update_file', 'edit_file', 'index_document', 'search_knowledge']
+
+─── iter 1 ─────────────────────────────────────────────
+[memory.read]   2 hits
+[perception]    ○ g:fd5c1c76 — Query the existing knowledge base regarding affordable methods for adapting a huge model on a single GPU
+[perception]    ○ g:0009af06 — Synthesise an answer describing methods for affordable huge model adaptation on a single GPU
+[decision]      TOOL_CALL: search_knowledge({"query": "affordable methods for adapting a huge model on a single GPU"})
+[action]        → {   "id": "mem:92055fdb",   "descriptor": "Affordable methods for adapting a huge model on a single GPU",   "source": "user_query",   "chunk_preview": "",   "metadata": {     "raw": "Which methods mak...
+
+─── iter 2 ─────────────────────────────────────────────
+[memory.read]   3 hits
+[perception]    ✓ g:fd5c1c76 — Query the existing knowledge base regarding affordable methods for adapting a huge model on a single GPU
+[perception]    ○ g:0009af06 — Synthesise an answer describing methods for affordable huge model adaptation on a single GPU
+[decision]      ANSWER: Adapting huge models on a single GPU has become feasible through several memory-efficient techniques that reduce the computational and VRAM footprint of training. The most prominent methods include:
+
+...
+
+─── iter 3 ─────────────────────────────────────────────
+[memory.read]   3 hits
+[perception]    ✓ g:fd5c1c76 — Query the existing knowledge base regarding affordable methods for adapting a huge model on a single GPU
+[perception]    ✓ g:0009af06 — Synthesise an answer describing methods for affordable huge model adaptation on a single GPU
+
+[done] all 2 goals satisfied
+
+══════════════════════════════════════════════════════════════════════════════
+FINAL: Adapting huge models on a single GPU has become feasible through several memory-efficient techniques that reduce the computational and VRAM footprint of training. The most prominent methods include:
+
+*   **Parameter-Efficient Fine-Tuning (PEFT):** Instead of updating all model parameters, PEFT methods like **LoRA (Low-Rank Adaptation)** freeze the pre-trained weights and inject trainable low-rank matrices into the layers. This drastically reduces the number of trainable parameters, saving both memory and storage.
+*   **Quantization (QLoRA):** This technique combines quantization with LoRA. By loading the base model in 4-bit precision (using formats like NF4), the memory requirement is significantly lowered, allowing massive models (e.g., 70B parameters) to fit onto consumer-grade GPUs while maintaining high performance.
+*   **Gradient Checkpointing:** This method trades computation for memory by discarding intermediate activations during the forward pass and recomputing them during the backward pass. While it increases training time slightly, it allows for much larger batch sizes or model sizes that would otherwise trigger Out-of-Memory (OOM) errors.
+*   **Mixed Precision Training (FP16/BF16):** Utilizing half-precision floating-point formats reduces the memory footprint of model weights and gradients by half compared to standard FP32, while also accelerating training speed on modern GPU architectures.
+*   **Optimizer State Offloading:** Techniques like those found in DeepSpeed ZeRO-Offload allow the offloading of optimizer states and gradients from the GPU VRAM to the system RAM, enabling the training of models that exceed the physical memory capacity of a single GPU.
+══════════════════════════════════════════════════════════════════════════════
+

@@ -1,0 +1,37 @@
+
+══════════════════════════════════════════════════════════════════════════════
+run 06df5278  ─  query: What are the three key contributions of the Transformer according to the attention paper?
+══════════════════════════════════════════════════════════════════════════════
+[mcp] loaded 11 tools: ['web_search', 'fetch_url', 'get_time', 'currency_convert', 'read_file', 'list_dir', 'create_file', 'update_file', 'edit_file', 'index_document', 'search_knowledge']
+
+─── iter 1 ─────────────────────────────────────────────
+[memory.read]   8 hits
+[perception]    ○ g:4825158f — Query the existing knowledge base for the key contributions of the Transformer model.
+[perception]    ○ g:bcf61d8d — Identify and list the three key contributions of the Transformer model from the retrieved information.
+[decision]      ANSWER: Based on the "Attention Is All You Need" paper, the Transformer model introduced three key contributions to address the limitations of recurrent and convolutional sequence models:
+
+*   **Replacement o...
+
+─── iter 2 ─────────────────────────────────────────────
+[memory.read]   8 hits
+[perception]    ✓ g:4825158f — Query the existing knowledge base for the key contributions of the Transformer model.
+[perception]    ○ g:bcf61d8d — Identify and list the three key contributions of the Transformer model from the retrieved information.
+[decision]      ANSWER: Based on the "Attention Is All You Need" paper, the three key contributions of the Transformer model are:
+
+1.  **Replacement of Recurrence with Self-Attention:** The Transformer eliminates recurrent a...
+
+─── iter 3 ─────────────────────────────────────────────
+[memory.read]   8 hits
+[perception]    ✓ g:4825158f — Query the existing knowledge base for the key contributions of the Transformer model.
+[perception]    ✓ g:bcf61d8d — Identify and list the three key contributions of the Transformer model from the retrieved information.
+
+[done] all 2 goals satisfied
+
+══════════════════════════════════════════════════════════════════════════════
+FINAL: Based on the "Attention Is All You Need" paper, the three key contributions of the Transformer model are:
+
+1.  **Replacement of Recurrence with Self-Attention:** The Transformer eliminates recurrent and convolutional layers entirely, relying instead on self-attention mechanisms to process sequences.
+2.  **Parallelization of Computation:** By using scaled dot-product attention, the model computes representations for all positions in a sequence simultaneously, allowing for significantly higher parallelism during training compared to sequential models.
+3.  **Improved Long-Range Dependency Modeling:** Because each position attends to every other position directly, the model effectively removes the distance-based limitations of recurrent models, making it much easier to learn dependencies between distant tokens in a sequence.
+══════════════════════════════════════════════════════════════════════════════
+
