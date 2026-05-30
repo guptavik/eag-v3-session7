@@ -1,8 +1,16 @@
-"""Tests for the EAGV3 S7 MCP server. Run: pytest -v test_mcp_server.py"""
+"""Tests for the EAGV3 S7 MCP server. Run: pytest -v test_mcp_server.py
+
+Windows note: the session fixture spawns the MCP server as a subprocess via
+asyncio stdio. On Windows the ProactorEventLoop + session-scoped pytest-asyncio
+fixture combination can cause the initialize() handshake to hang. The tools
+themselves work correctly (proven by all live agent traces). If the tests hang,
+run them from WSL or Linux where the unix-pipe asyncio path is used instead.
+"""
 
 from __future__ import annotations
 
 import json
+import os
 import shutil
 import sys
 from pathlib import Path
@@ -42,7 +50,8 @@ def _clean_sandbox() -> None:
 
 @pytest_asyncio.fixture(scope="session", loop_scope="session")
 async def session():
-    params = StdioServerParameters(command=sys.executable, args=[str(SERVER)])
+    child_env = {**os.environ, "PYTHONIOENCODING": "utf-8", "PYTHONUTF8": "1"}
+    params = StdioServerParameters(command=sys.executable, args=[str(SERVER)], env=child_env)
     async with stdio_client(params) as (read, write):
         async with ClientSession(read, write) as s:
             await s.initialize()
