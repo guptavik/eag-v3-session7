@@ -26,6 +26,7 @@ from __future__ import annotations
 
 import asyncio
 import json
+import os
 import sys
 import uuid
 from pathlib import Path
@@ -72,7 +73,10 @@ async def run(query: str) -> str:
     except Exception as e:
         print(f"[memory.remember] skipped: {e}")
 
-    server_params = StdioServerParameters(command=sys.executable, args=[str(MCP_SERVER)])
+    child_env = dict(os.environ)
+    child_env["PYTHONIOENCODING"] = "utf-8"
+    child_env.setdefault("PYTHONUTF8", "1")
+    server_params = StdioServerParameters(command=sys.executable, args=[str(MCP_SERVER)], env=child_env)
     history: list[dict] = []
     prior_goals: list[Goal] = []
     final_answer: str = ""

@@ -1,4 +1,4 @@
-"""Tests for the EAGV3 S6 MCP server. Run: pytest -v test_mcp_server.py"""
+"""Tests for the EAGV3 S7 MCP server. Run: pytest -v test_mcp_server.py"""
 
 from __future__ import annotations
 
@@ -121,8 +121,12 @@ async def test_list_dir(session):
     res = await session.call_tool("list_dir", {"path": "."})
     data = _result(res)
     print("list_dir:", data)
-    assert isinstance(data, list)
-    names = {e["name"]: e for e in data}
+    # S7 list_dir returns a single dict ({path, count, names, entries}) rather
+    # than a bare list, so cardinality survives downstream prompt truncation.
+    assert isinstance(data, dict)
+    assert data["count"] == 2
+    assert set(data["names"]) == {"a.txt", "sub"}
+    names = {e["name"]: e for e in data["entries"]}
     assert names["a.txt"]["type"] == "file"
     assert names["a.txt"]["size_bytes"] == 1
     assert names["sub"]["type"] == "dir"

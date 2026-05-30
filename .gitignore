@@ -5,8 +5,14 @@
 
 # runtime state
 state/
-sandbox/
+sandbox/*
 usage.json
+
+# but keep the committed corpora (everything else under sandbox/ stays ignored).
+# `sandbox/*` ignores sandbox's contents so these subdirs can be re-included;
+# a bare `sandbox/` would make re-inclusion impossible.
+!sandbox/papers/
+!sandbox/corpus/
 
 # python
 __pycache__/

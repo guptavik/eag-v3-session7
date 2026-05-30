@@ -33,7 +33,7 @@ def put(blob: bytes, *, content_type: str, source: str, descriptor: str) -> str:
             source=source,
             descriptor=descriptor,
         )
-        meta_path.write_text(meta.model_dump_json(indent=2))
+        meta_path.write_text(meta.model_dump_json(indent=2), encoding="utf-8")
     return art_id
 
 

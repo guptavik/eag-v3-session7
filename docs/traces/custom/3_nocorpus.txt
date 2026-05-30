@@ -1,0 +1,44 @@
+
+══════════════════════════════════════════════════════════════════════════════
+run 98ee475b  ─  query: What are the three key contributions of the Transformer according to the attention paper?
+══════════════════════════════════════════════════════════════════════════════
+[mcp] loaded 11 tools: ['web_search', 'fetch_url', 'get_time', 'currency_convert', 'read_file', 'list_dir', 'create_file', 'update_file', 'edit_file', 'index_document', 'search_knowledge']
+
+─── iter 1 ─────────────────────────────────────────────
+[memory.read]   4 hits
+[perception]    ○ g:6edc8f05 — Query the existing knowledge base for the three key contributions of the Transformer model.
+[perception]    ○ g:785beed6 — Summarise and list the three key contributions of the Transformer as identified in the attention paper.
+[decision]      TOOL_CALL: search_knowledge({"query": "three key contributions of the Transformer model"})
+[action]        → {   "id": "mem:069a4087",   "descriptor": "Three key contributions of the Transformer model as described in the attention paper",   "source": "user_query",   "chunk_preview": "",   "metadata": {     "...
+
+─── iter 2 ─────────────────────────────────────────────
+[memory.read]   5 hits
+[perception]    ✓ g:6edc8f05 — Query the existing knowledge base for the three key contributions of the Transformer model.
+[perception]    ○ g:785beed6 — Summarise and list the three key contributions of the Transformer as identified in the attention paper.
+[decision]      TOOL_CALL: web_search({"query": "three key contributions of the Transformer model attention is all you need paper"})
+[action]        → [artifact art:cc3c198dde289b7e, 11049 bytes] preview: {   "title": "Attention Is All You Need - A Deep Dive into the Revolutionary ...",   "url": "https://towardsai.net/p/machine-learning/attention-is...   +art:cc3c198dde289b7e
+
+─── iter 3 ─────────────────────────────────────────────
+[memory.read]   6 hits
+[perception]    ✓ g:6edc8f05 — Query the existing knowledge base for the three key contributions of the Transformer model.
+[perception]    ○ g:785beed6 — Summarise and list the three key contributions of the Transformer as identified in the attention paper.  attach=art:cc3c198dde289b7e
+[attach]        art:cc3c198dde289b7e (11049 bytes)
+[decision]      ANSWER: The Transformer model, as introduced in the "Attention Is All You Need" paper, is primarily recognized for three key contributions that revolutionized sequence transduction:
+
+1.  **Elimination of Recu...
+
+─── iter 4 ─────────────────────────────────────────────
+[memory.read]   6 hits
+[perception]    ✓ g:6edc8f05 — Query the existing knowledge base for the three key contributions of the Transformer model.
+[perception]    ✓ g:785beed6 — Summarise and list the three key contributions of the Transformer as identified in the attention paper.
+
+[done] all 2 goals satisfied
+
+══════════════════════════════════════════════════════════════════════════════
+FINAL: The Transformer model, as introduced in the "Attention Is All You Need" paper, is primarily recognized for three key contributions that revolutionized sequence transduction:
+
+1.  **Elimination of Recurrence and Convolution:** The Transformer is the first sequence transduction model to rely entirely on self-attention mechanisms to compute representations of its input and output. By eschewing recurrent neural networks (RNNs) and convolutional neural networks (CNNs), it avoids the sequential processing bottlenecks inherent in those architectures.
+2.  **Full Parallelization:** Because the model does not rely on recurrence, it can process entire sequences in parallel rather than element-by-element. This allows for significantly faster training times compared to previous state-of-the-art models, enabling the training of much larger models on modern hardware.
+3.  **Global Dependency Modeling:** Through the use of multi-head self-attention, the model can draw global dependencies between input and output sequences regardless of their distance. This allows the model to capture contextual relationships more effectively than previous architectures, which often struggled with long-range dependencies.
+══════════════════════════════════════════════════════════════════════════════
+

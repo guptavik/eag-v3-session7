@@ -1,0 +1,51 @@
+
+══════════════════════════════════════════════════════════════════════════════
+run 4b6fa533  ─  query: Which papers teach a model to reason before answering, and how do they differ?
+══════════════════════════════════════════════════════════════════════════════
+[mcp] loaded 11 tools: ['web_search', 'fetch_url', 'get_time', 'currency_convert', 'read_file', 'list_dir', 'create_file', 'update_file', 'edit_file', 'index_document', 'search_knowledge']
+
+─── iter 1 ─────────────────────────────────────────────
+[memory.read]   8 hits
+[perception]    ○ g:03415fd9 — Query the existing knowledge base for papers on models that reason before answering
+[perception]    ○ g:f2de88d7 — Identify and extract the reasoning approaches from the relevant papers in the knowledge base and synthesise a comparison between them
+[decision]      TOOL_CALL: search_knowledge({"query": "models that reason before answering chain-of-thought reasoning"})
+[action]        → {   "id": "mem:5e5b4e32",   "descriptor": "Research papers on models using chain-of-thought reasoning before answering",   "source": "user_query",   "chunk_preview": "",   "metadata": {     "raw": "Wh...
+
+─── iter 2 ─────────────────────────────────────────────
+[memory.read]   8 hits
+[perception]    ○ g:03415fd9 — Query the existing knowledge base for papers on models that reason before answering
+[perception]    ○ g:f2de88d7 — Identify and extract the reasoning approaches from the relevant papers in the knowledge base and synthesise a comparison between them
+[decision]      ANSWER: Based on the knowledge base, there are two primary papers that address models reasoning before answering, each taking a distinct approach to how that reasoning is utilized:
+
+*   **ReAct: Synergizing R...
+
+─── iter 3 ─────────────────────────────────────────────
+[memory.read]   8 hits
+[perception]    ✓ g:03415fd9 — Query the existing knowledge base for papers on models that reason before answering
+[perception]    ○ g:f2de88d7 — Identify and extract the reasoning approaches from the relevant papers in the knowledge base and synthesise a comparison between them
+[decision]      ANSWER: Based on the knowledge base, the reasoning approaches in the identified papers can be compared as follows:
+
+*   **ReAct (Synergizing Reasoning and Acting):** This approach addresses the limitation whe...
+
+─── iter 4 ─────────────────────────────────────────────
+[memory.read]   8 hits
+[perception]    ✓ g:03415fd9 — Query the existing knowledge base for papers on models that reason before answering
+[perception]    ✓ g:f2de88d7 — Identify and extract the reasoning approaches from the relevant papers in the knowledge base and synthesise a comparison between them
+
+[done] all 2 goals satisfied
+
+══════════════════════════════════════════════════════════════════════════════
+FINAL: Based on the knowledge base, the reasoning approaches in the identified papers can be compared as follows:
+
+*   **ReAct (Synergizing Reasoning and Acting):** This approach addresses the limitation where standard chain-of-thought reasoning occurs entirely within the model, leading to potential hallucinations on knowledge-heavy tasks. ReAct solves this by interleaving free-form reasoning traces with discrete actions (e.g., tool use). At each step, the model generates a "thought" to plan, executes an action to gather external information, and then incorporates that information into its next reasoning step. This creates a dynamic loop that bridges internal thought with external reality.
+
+*   **Reflexion (Verbal Reinforcement Learning):** This approach focuses on improving agent performance over time without the need for expensive weight updates. While ReAct focuses on real-time reasoning during a task, Reflexion focuses on post-task evaluation. After an attempt, the agent receives a reward signal and generates a written "self-reflection" that diagnoses its failures. This verbal feedback is stored in memory, allowing the agent to learn from its mistakes and adjust its strategy in subsequent attempts.
+
+*   **Constitutional AI (Self-Correction via Principles):** While distinct from the agentic loops of ReAct and Reflexion, this approach also utilizes a form of reasoning before final output. It uses a "constitution" (a set of written principles) to guide the model. During a supervised phase, the model critiques and revises its own responses against these principles. This shifts the reasoning process from task-solving (as in ReAct/Reflexion) to value-alignment and safety, where the model reasons about the ethical implications of its output before finalizing it.
+
+**Comparison Summary:**
+*   **ReAct** is designed for **real-time interaction** with the environment to ground reasoning in external facts.
+*   **Reflexion** is designed for **iterative improvement** by reflecting on past failures to refine future performance.
+*   **Constitutional AI** is designed for **alignment and safety**, using internal reasoning to ensure outputs adhere to predefined principles rather than just task success.
+══════════════════════════════════════════════════════════════════════════════
+

@@ -23,10 +23,21 @@ from __future__ import annotations
 
 import json
 import os
+import sys
 import threading
 from datetime import datetime
 from pathlib import Path
 from zoneinfo import ZoneInfo
+
+# Force UTF-8 on stdout/stderr before any tool imports run. crawl4ai's Rich
+# logger writes box-drawing chars during fetch; on Windows the default cp1252
+# codec raises UnicodeEncodeError mid-tool-call which the FastMCP wrapper
+# turns into a silent tool error. Doing it here covers both cases.
+for _stream in (sys.stdout, sys.stderr):
+    try:
+        _stream.reconfigure(encoding="utf-8", errors="replace")  # type: ignore[attr-defined]
+    except Exception:
+        pass
 
 import httpx
 from ddgs import DDGS
@@ -35,7 +46,6 @@ from mcp.server.fastmcp import FastMCP
 
 # Same-directory imports for the Memory and Artifact services so that the
 # new index_document / search_knowledge tools can delegate into them.
-import sys
 sys.path.insert(0, str(Path(__file__).parent))
 import artifacts as _artifacts  # noqa: E402
 import memory as _memory  # noqa: E402
