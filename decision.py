@@ -68,13 +68,7 @@ SYSTEM = (
     "  corpus was indexed in the first place; re-fetching is wasted work.\n"
     "  The chunk text for each indexed hit is shown inline under the hit's\n"
     "  descriptor (`chunk: ...`); synthesise directly from those previews\n"
-    "  rather than re-issuing the same vector query.\n"
-    "- ANTI-LOOP: if RECENT HISTORY shows `search_knowledge` was already\n"
-    "  called with an equal or similar query and returned results, do NOT\n"
-    "  call it again. Synthesise an answer from whatever chunks are visible\n"
-    "  in MEMORY HITS and RECENT HISTORY, even if they discuss the concept\n"
-    "  indirectly. Calling the same tool with the same arguments never\n"
-    "  produces new results."
+    "  rather than re-issuing the same vector query."
 )
 
 # How much attached content to send to the model per turn. Most LARGE-tier
