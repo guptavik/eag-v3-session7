@@ -1,21 +1,24 @@
 # Submission Video — Shot List
 
 Target length: **3–5 minutes**. Screen-record the terminal + browser; no slides needed.
+Run all commands from `Z:\eag-v3\eag-v3-session7` in **PowerShell**.
 
 ---
 
 ## Shot 1 — Repo tour (0:00–0:40)
 
 **What to show:**
-```bash
-ls -1               # agent7.py, memory.py, perception.py, decision.py,
-                    # action.py, artifacts.py, mcp_server.py, schemas.py,
-                    # vector_index.py, gateway.py
-ls sandbox/corpus/ | wc -l    # 56 (55 md + MANIFEST)
-ls sandbox/papers/             # 5 reference papers
+```powershell
+Get-ChildItem *.py | Select-Object Name
+# agent7.py, memory.py, perception.py, decision.py,
+# action.py, artifacts.py, mcp_server.py, schemas.py,
+# vector_index.py, gateway.py
+
+(Get-ChildItem sandbox\corpus\).Count    # 56 (55 md + MANIFEST)
+Get-ChildItem sandbox\papers\            # 5 reference papers
 ```
 
-**Say:** "This is the Session 7 agent — a four-layer cognitive loop: memory reads, 
+**Say:** "This is the Session 7 agent — a four-layer cognitive loop: memory reads,
 perception sets goals, decision picks a tool or answers, action dispatches. Session 7
 adds FAISS-backed vector memory and two new tools: `index_document` and `search_knowledge`.
 The corpus is 55 AI/ML paper summaries; the 5 files under `papers/` back the base queries."
@@ -25,12 +28,12 @@ The corpus is 55 AI/ML paper summaries; the 5 files under `papers/` back the bas
 ## Shot 2 — Architectural gate: tool-blindness (0:40–1:10)
 
 **What to show:**
-```bash
-uv run pytest -v test_perception_tool_blindness.py
+```powershell
+uv run pytest test_perception_tool_blindness.py -v
 # → 2 passed
 
-grep -E "web_search|fetch_url|index_document|search_knowledge" perception.py \
-  && echo FAIL || echo PASS
+$hits = Select-String -Pattern "web_search|fetch_url|index_document|search_knowledge" perception.py
+if ($hits) { "FAIL" } else { "PASS" }
 # → PASS
 ```
 
@@ -43,10 +46,9 @@ Perception's prompt, the test fails."
 ## Shot 3 — Base query E: index + extract (1:10–2:00)
 
 Run live (takes ~30s):
-```bash
-uv run run_query.py --clear --out /tmp/e_live.txt \
-  "Index the file papers/attention.md and tell me what the three key \
-contributions of the Transformer architecture are according to this paper."
+```powershell
+uv run run_query.py --clear --out $env:TEMP\e_live.txt `
+  "Index the file papers/attention.md and tell me what the three key contributions of the Transformer architecture are according to this paper."
 ```
 
 **Show the terminal as it runs.** Point out:
@@ -63,22 +65,26 @@ in the very next memory read."
 ## Shot 4 — Semantic recall demo (Q1 — credit assignment) (2:00–3:00)
 
 **First — no corpus (cleared state):**
-```bash
-uv run run_query.py --clear --out /tmp/q1_no.txt \
+```powershell
+uv run run_query.py --clear --out $env:TEMP\q1_no.txt `
   "Across these papers, how do they handle the credit assignment problem?"
 # → web_search called, generic RL answer, no corpus citations
 ```
 
 **Then — with corpus (index first):**
-```bash
-python -c "import memory; memory.clear()"
-uv run build_corpus_index.py corpus     # 55 chunks indexed
-uv run run_query.py --out /tmp/q1_with.txt \
+```powershell
+uv run python -c "import memory; memory.clear()"
+uv run build_corpus_index.py corpus     # 55 chunks indexed (~3 min, run beforehand)
+uv run run_query.py --out $env:TEMP\q1_with.txt `
   "Across these papers, how do they handle the credit assignment problem?"
 # → answers from memory hits, cites seq2seq/attention/layernorm/etc.
 ```
 
-**Show the contrast in the two FINAL lines.**
+**Show the contrast — print the two FINAL lines:**
+```powershell
+Select-String "^FINAL:" $env:TEMP\q1_no.txt   | Select-Object -First 1
+Select-String "^FINAL:" $env:TEMP\q1_with.txt | Select-Object -First 1
+```
 
 **Say:** "The phrase 'credit assignment' does not appear in a single corpus chunk.
 Vector search surfaces papers that relate to it conceptually — LSTM's gradient
@@ -91,8 +97,8 @@ it answers in 3 iterations from the indexed corpus."
 ## Shot 5 — Cross-run FAISS persistence (F run 2) (3:00–3:40)
 
 **Show the existing trace file** (no need to re-run):
-```bash
-head -30 docs/traces/base/F_run2.txt
+```powershell
+Get-Content docs\traces\base\F_run2.txt -TotalCount 30
 ```
 
 **Point out:**
@@ -109,8 +115,8 @@ crosses the process boundary. The agent answered without re-indexing anything."
 
 ## Shot 6 — One-line close (3:40–4:00)
 
-```bash
-git log --oneline | head -8
+```powershell
+git log --oneline | Select-Object -First 8
 ```
 
 **Say:** "The architecture is intact: tool-blind Perception, byte isolation through
@@ -122,9 +128,17 @@ iteration bounds, 5 custom queries — 2 with proven semantic recall."
 
 ## Notes for recording
 
-- Use the project `.venv`: prefix every command with `uv run` or activate it first
-- The gateway auto-starts on the first query (takes ~15s); start it manually before
-  filming: `cd llm_gatewayV7 && uv run main.py`
-- The `build_corpus_index.py` step takes ~3 min for 55 files (one embed call each);
-  either run it beforehand and skip it in the video, or cut to the result
-- Keep the terminal font size large enough to read on a 1080p share
+- The gateway must be running before filming — start it in a separate PowerShell window:
+  ```powershell
+  cd Z:\eag-v3\eag-v3-session7\llm_gatewayV7
+  uv run main.py
+  ```
+  Or just run the first query and let `ensure_gateway()` auto-start it (takes ~15s).
+- Kill any existing gateway first if port 8107 is in use:
+  ```powershell
+  Get-NetTCPConnection -LocalPort 8107 | Select-Object -ExpandProperty OwningProcess | ForEach-Object { Stop-Process -Id $_ -Force }
+  ```
+- **Pre-run `build_corpus_index.py` before filming Shot 4** — it takes ~3 min.
+  Have the index ready so the with-corpus query runs immediately.
+- Keep the terminal font size large enough to read on a 1080p share (PowerShell:
+  right-click title bar → Properties → Font → size 18–20).
