@@ -592,18 +592,20 @@ All eight queries run verbatim against `agent7.py`. Traces: [docs/traces/base/](
 > the model). ReAct treats it as a dynamic interactive loop — interleaving thoughts with
 > tool actions so reasoning is grounded in external facts.
 
-### Diagnostic note: G iteration history
+### Diagnostic note: G iteration history and state dependency
 
-First run: 17 iters (exceeded ≤4 bound). Decision looped on `search_knowledge` because
-none of the 5 papers directly contain the phrase "credit assignment" — it kept searching
-for a more specific answer rather than synthesising from the related chunks it had.
+**State dependency:** G must run in the same state chain as F-run1 (no `--clear`
+between them). If state is cleared before G, the FAISS index is empty, the model
+correctly reports "I don't have access to the research papers", and the query loops
+to the 20-iteration cap. Always run F-run1 → F-run2 → G → H as one uninterrupted group.
 
-**Root cause:** a logic gap, not a rendering bug. Chunk content was visible in memory
-hits (`_format_hits` renders `value.chunk`); Decision correctly judged it indirect and
-searched for more. The fix: add an explicit anti-loop rule to Decision's SYSTEM prompt —
-"if `search_knowledge` was already called with a similar query and returned results,
-synthesise from what is visible rather than re-issuing the same query." After the fix:
-3 iters, excellent answer. See [decision.py](decision.py) ANTI-LOOP rule.
+**Model size lesson:** An early run of G produced 17 iters (exceeded ≤4 bound) when
+a small model was used. The model looped on `search_knowledge` because it correctly
+judged the chunks as indirect and kept searching for something more specific. The fix
+was not a SYSTEM rule — it was ensuring the router selects a sufficiently capable
+model tier for the Decision layer. With the right model, G completes in 4 iters
+without any SYSTEM patch. **Lesson: when an agent loops, check the model tier before
+adding SYSTEM rules.**
 
 ---
 
@@ -626,11 +628,11 @@ Traces: [docs/traces/custom/](docs/traces/custom/)
 
 The phrases `credit assignment`, `single GPU`, `one GPU`, and `affordable` are **absent** from every corpus chunk:
 
-```bash
+```powershell
 # run from repo root — all should print nothing
-grep -ri "credit assignment" sandbox/corpus/
-grep -riE "single gpu|one gpu" sandbox/corpus/
-grep -ri "affordable" sandbox/corpus/
+Select-String -Pattern "credit assignment" sandbox\corpus\*.md
+Select-String -Pattern "single gpu|one gpu" sandbox\corpus\*.md -CaseSensitive:$false
+Select-String -Pattern "affordable" sandbox\corpus\*.md
 ```
 
 Vector search surfaces the right papers by concept, not by keyword:
@@ -701,11 +703,11 @@ saying "answer from memory when memory contains the date." Actual cause: `_forma
 rendered the descriptor ("mom's birthday remembered") but dropped `value.raw` which
 contained "15 May 2026." Fix: render the `raw` field. SYSTEM addition removed.
 
-*Synonym recall loop (G):* First run: 17 iters, Decision looped on `search_knowledge`.
-Root cause was a **logic gap**, not a rendering bug — chunks were visible but Decision
-correctly judged none directly mentioned "credit assignment" and kept searching for
-something more specific. Fix: add the ANTI-LOOP rule (calling the same tool with the
-same args never produces new results). After fix: 3 iters.
+*Synonym recall loop (G):* An early run produced 17 iters when a small model was used.
+The model correctly judged the retrieved chunks as only indirectly related and kept
+searching for something more specific. Root cause: model capability, not a rendering
+or architecture bug. Fix: ensure the router selects a sufficiently capable model tier
+for Decision. With the right tier, G completes in 4 iters without any SYSTEM patch.
 
 ### 3. Byte isolation
 
@@ -732,71 +734,92 @@ silent. Treat the model as a project-level constant for the lifetime of an index
 - Gateway running: `cd llm_gatewayV7 && uv run main.py` (or let `agent7` auto-start it)
 - `.env` with `GEMINI_API_KEY`, `GROQ_API_KEY`, and optionally `TAVILY_API_KEY`
 
+### ⚠️ State management
+
+The base queries share FAISS state across groups. **Never `--clear` inside a group.**
+
+| Group | Queries | Rule |
+|-------|---------|------|
+| 1 | A → B → C → C_run2 → D | `--clear` on A only |
+| 2 | E | `--clear` on E |
+| 3 | F-run1 → F-run2 → **G** → H | `--clear` on F-run1 only — G and H **require** F's index |
+
+If you clear state before G, the FAISS index is empty and G loops to the 20-iter cap.
+
 ### Base traces (A–H)
 
-```bash
-# State plan: A clears first; A→B→C-run1→C-run2→D share state;
-# E clears; F-run1 clears; F-run1→F-run2→G→H share state.
-
-uv run run_query.py --clear --out docs/traces/base/A.txt \
+```powershell
+# Group 1 — web + memory
+uv run run_query.py --clear --out docs\traces\base\A.txt `
   "Fetch https://en.wikipedia.org/wiki/Claude_Shannon and tell me his birth date, death date, and three key contributions to information theory."
 
-uv run run_query.py --out docs/traces/base/B.txt \
+uv run run_query.py --out docs\traces\base\B.txt `
   "Find 3 family-friendly things to do in Tokyo this weekend. Check Saturday's weather forecast there and tell me which one is most appropriate."
 
-uv run run_query.py --out docs/traces/base/C.txt \
+uv run run_query.py --out docs\traces\base\C.txt `
   "My mom's birthday is 15 May 2026. Remember that and create reminders for two weeks before and on the day."
 
-uv run run_query.py --out docs/traces/base/C_run2.txt \
+uv run run_query.py --out docs\traces\base\C_run2.txt `
   "When is mom's birthday?"
 
-uv run run_query.py --out docs/traces/base/D.txt \
+uv run run_query.py --out docs\traces\base\D.txt `
   'Search for "Python asyncio best practices", read the top 3 results, and give me a short numbered list of the advice they agree on.'
 
-uv run run_query.py --clear --out docs/traces/base/E.txt \
+# Group 2 — single-doc RAG
+uv run run_query.py --clear --out docs\traces\base\E.txt `
   "Index the file papers/attention.md and tell me what the three key contributions of the Transformer architecture are according to this paper."
 
-uv run run_query.py --clear --out docs/traces/base/F.txt \
+# Group 3 — RAG + cross-run + semantic (must run in sequence, no clear after F)
+uv run run_query.py --clear --out docs\traces\base\F.txt `
   "Index every .md file under papers/. Confirm how many chunks were indexed in total."
 
-uv run run_query.py --out docs/traces/base/F_run2.txt \
+uv run run_query.py --out docs\traces\base\F_run2.txt `
   "Across the papers I have indexed, what do they say about chain-of-thought reasoning?"
 
-uv run run_query.py --out docs/traces/base/G.txt \
+uv run run_query.py --out docs\traces\base\G.txt `
   "Across these papers, how do they handle the credit assignment problem?"
 
-uv run run_query.py --out docs/traces/base/H.txt \
+uv run run_query.py --out docs\traces\base\H.txt `
   "Compare how the ReAct paper and the Chain-of-Thought paper differ in their treatment of intermediate reasoning."
+```
+
+**Verify bounds:**
+```powershell
+foreach ($f in Get-ChildItem docs\traces\base\*.txt) {
+    $n = (Select-String "── iter" $f.FullName).Count
+    Write-Host "$($f.Name): $n iters"
+}
+# A:3 B:≤8 C:4 C_run2:3 D:≤6 E:≤5 F:≤11 F_run2:3 G:≤4 H:3
 ```
 
 ### Custom queries (5 × with-corpus + 5 × no-corpus)
 
-```bash
+```powershell
 # --- no-corpus runs (cleared state, no index) ---
-uv run run_query.py --clear --out docs/traces/custom/1_nocorpus.txt \
+uv run run_query.py --clear --out docs\traces\custom\1_nocorpus.txt `
   "Across these papers, how do they handle the credit assignment problem?"
-uv run run_query.py --out docs/traces/custom/2_nocorpus.txt \
+uv run run_query.py --out docs\traces\custom\2_nocorpus.txt `
   "Which methods make adapting a huge model affordable on a single GPU?"
-uv run run_query.py --out docs/traces/custom/3_nocorpus.txt \
+uv run run_query.py --out docs\traces\custom\3_nocorpus.txt `
   "What are the three key contributions of the Transformer according to the attention paper?"
-uv run run_query.py --out docs/traces/custom/4_nocorpus.txt \
+uv run run_query.py --out docs\traces\custom\4_nocorpus.txt `
   "Compare how DPO and PPO-style RLHF approach preference optimization."
-uv run run_query.py --out docs/traces/custom/5_nocorpus.txt \
+uv run run_query.py --out docs\traces\custom\5_nocorpus.txt `
   "Which papers teach a model to reason before answering, and how do they differ?"
 
-# --- build the full corpus index ---
-python -c "import memory; memory.clear()"
-uv run build_corpus_index.py corpus   # indexes all 55 files (~55 chunks)
+# --- build the full corpus index (~3 min) ---
+uv run python -c "import memory; memory.clear()"
+uv run build_corpus_index.py corpus   # 55 files → 55 chunks
 
-# --- with-corpus runs (shared index) ---
-uv run run_query.py --out docs/traces/custom/1_with.txt \
+# --- with-corpus runs (shared index, no clear) ---
+uv run run_query.py --out docs\traces\custom\1_with.txt `
   "Across these papers, how do they handle the credit assignment problem?"
-uv run run_query.py --out docs/traces/custom/2_with.txt \
+uv run run_query.py --out docs\traces\custom\2_with.txt `
   "Which methods make adapting a huge model affordable on a single GPU?"
-uv run run_query.py --out docs/traces/custom/3_with.txt \
+uv run run_query.py --out docs\traces\custom\3_with.txt `
   "What are the three key contributions of the Transformer according to the attention paper?"
-uv run run_query.py --out docs/traces/custom/4_with.txt \
+uv run run_query.py --out docs\traces\custom\4_with.txt `
   "Compare how DPO and PPO-style RLHF approach preference optimization."
-uv run run_query.py --out docs/traces/custom/5_with.txt \
+uv run run_query.py --out docs\traces\custom\5_with.txt `
   "Which papers teach a model to reason before answering, and how do they differ?"
 ```
